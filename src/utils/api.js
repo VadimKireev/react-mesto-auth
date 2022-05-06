@@ -3,6 +3,7 @@ class Api {
     this._cardsUrl = config.cardsUrl;
     this._userInfoUrl = config.userInfoUrl;
     this._userAvatarUrl = config.userAvatarUrl;
+    this._baseUrl = config.baseUrl;
     this._headers = config.headers;
   }
 
@@ -81,30 +82,6 @@ class Api {
     });
   }
 
-  // putLike(id) {
-  //   return fetch(`${this._cardsUrl}${id}/likes`, {
-  //     method: 'PUT',
-  //     headers: this._headers
-  //   }).then((res) => {
-  //     if (res.ok) {
-  //       return res.json();
-  //     }
-  //     return Promise.reject('Не удалось поставить лайк')
-  //   });
-  // }
-
-  // deleteLike(id) {
-  //   return fetch(`${this._cardsUrl}${id}/likes`, {
-  //     method: 'DELETE',
-  //     headers: this._headers
-  //   }).then((res) => {
-  //     if (res.ok) {
-  //       return res.json();
-  //     }
-  //     return Promise.reject('Не удалось убрать лайк')
-  //   });
-  // }
-
   changeLikeCardStatus(id, isLiked) {
     return fetch(`${this._cardsUrl}${id}/likes`, {
       method: isLiked ? 'DELETE' : 'PUT',
@@ -116,12 +93,26 @@ class Api {
       return Promise.reject('Не удалось поставить или удалить лайк')
     });
   }
+
+  register({password, email}) {
+    return fetch(`${this._baseUrl}/signup`, {
+      method: 'POST',
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({password, email})
+    }).then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        return Promise.reject('Что-то пошло не так')
+      })
+  }
 }
 
 const api = new Api({
   cardsUrl: 'https://mesto.nomoreparties.co/v1/cohort-37/cards/',
   userInfoUrl: 'https://nomoreparties.co/v1/cohort-37/users/me/',
   userAvatarUrl: 'https://mesto.nomoreparties.co/v1/cohort-37/users/me/avatar/',
+  baseUrl: 'https://auth.nomoreparties.co',
   headers: {
     authorization: '0d42fc8d-987f-4cd6-8e38-433e5816658e',
     'Content-Type': 'application/json'

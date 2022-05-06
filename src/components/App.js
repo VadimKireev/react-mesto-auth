@@ -16,7 +16,7 @@ import ImagePopup from './ImagePopup';
 import InfoTooltip from './InfoTooltip';
 import api from '../utils/api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { Route, Switch, useHistory } from  'react-router-dom'
+import { Route, Switch, useHistory } from  'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 
 function App() {
@@ -29,7 +29,8 @@ function App() {
   const [selectedCard, setSelectedCard] = useState({name: '', link: ''});
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   const history = useHistory();
 
@@ -50,6 +51,19 @@ function App() {
       alert(err);
     });
   }, []);
+
+  useEffect(() => {
+    tokenCheck();
+  }, [])
+
+  useEffect(() => {
+    if (loggedIn) {
+        history.push("/");
+        return;
+    }
+
+    history.push('/sign-in');
+}, [loggedIn, history]);
 
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
@@ -74,7 +88,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsImagePopupOpen(false);
-    setInfoTooltipOpen({opened: false})
+    setInfoTooltipOpen({opened: false, success: isInfoTooltipOpen.success})
   }
 
   const handleUpdateUser = ({ name, about }) => {
@@ -129,23 +143,52 @@ function App() {
     })
     .catch(() => {
       setInfoTooltipOpen({ opened: true, success: false });
-      console.log('123');
     });
+  }
+
+  const handleLogin = ({password, email}) => {
+    return api.login({password, email})
+    .then((res) => {
+      localStorage.setItem('token', res.token);
+      tokenCheck();
+      setLoggedIn(true);
+      history.push('/');
+    })
+    .catch(() => {
+      setInfoTooltipOpen({ opened: true, success: false });
+    });
+  }
+
+  const handleLogout = () => {
+		localStorage.removeItem('token');
+		setLoggedIn(false);
+	}
+
+  const tokenCheck = () => {
+    if (localStorage.getItem('token')) {
+      let token = localStorage.getItem('token');
+      api.getContent(token).then((res) => {
+        if (res) {
+          setUserEmail(res.data.email);
+          setLoggedIn(true);
+        }
+      })
+    }
   }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header logo={logo} />
+        <Header logo={logo} email={userEmail} loggedIn={loggedIn} handleLogout={handleLogout} />
         <Switch>
           <Route path="/sign-up">
             <Register handleRegister={handleRegister} />
           </Route>
           <Route path="/sign-in">
-            <Login />
+            <Login handleLogin={handleLogin} />
           </Route>
           <ProtectedRoute
-          exact path="/main"
+          exact path="/"
           loggedIn={loggedIn}
           component={Main}
           onEditProfile={handleEditProfileClick}

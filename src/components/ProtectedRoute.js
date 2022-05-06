@@ -4,10 +4,10 @@ function ProtectedRoute({ component: Component, ...props }) {
 
   return(
     <Route>
-    {() =>
-      props.loggedIn ? <Component {...props} /> : <Redirect to="./sign-up" />
-    }
-  </Route>
+      {() =>
+        props.loggedIn ? <Component {...props} /> : <Redirect to="./sign-up" />
+      }
+    </Route>
   )
 }
 

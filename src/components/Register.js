@@ -9,10 +9,10 @@ function Register(props) {
 
   const handleChange = (e) => {
     const {name, value} = e.target;
-    setState((prev) => ({
-      ...prev,
+    setState({
+      ...state,
       [name]: value,
-    }))
+    });
   }
 
   const handleSubmit = (e) => {

@@ -106,6 +106,34 @@ class Api {
         return Promise.reject('Что-то пошло не так')
       })
   }
+
+  login({password, email}) {
+    return fetch(`${this._baseUrl}/signin`, {
+      method: 'POST',
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({password, email})
+    }).then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        return Promise.reject('Что-то пошло не так');
+      })
+  }
+
+  getContent(token) {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization" : `Bearer ${token}`
+      }
+    }).then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+      return Promise.reject('Сначала авторизуйтесь');
+    });
+  }
 }
 
 const api = new Api({

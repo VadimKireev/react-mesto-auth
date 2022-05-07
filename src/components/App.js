@@ -61,7 +61,6 @@ function App() {
         history.push("/");
         return;
     }
-
     history.push('/sign-in');
 }, [loggedIn, history]);
 
@@ -115,6 +114,8 @@ function App() {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
       setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+    }).catch((err) => {
+      alert(err);
     });
   }
 
@@ -122,6 +123,8 @@ function App() {
     api.deleteCard(card._id)
     .then(() => {
       setCards((state) => state.filter((c) => c._id === card._id ? !c : c));
+    }).catch((err) => {
+      alert(err);
     });
   }
 
@@ -166,13 +169,15 @@ function App() {
 
   const tokenCheck = () => {
     if (localStorage.getItem('token')) {
-      let token = localStorage.getItem('token');
+      const token = localStorage.getItem('token');
       api.getContent(token).then((res) => {
         if (res) {
           setUserEmail(res.data.email);
           setLoggedIn(true);
         }
-      })
+      }).catch((err) => {
+        alert(err);
+      });
     }
   }
 

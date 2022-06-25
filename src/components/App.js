@@ -37,31 +37,31 @@ function App() {
   useEffect(() => {
     api.getUserInfo()
     .then((response) => {
-      setCurrentUser(response);
+      setCurrentUser(response.data);
     })
     .catch((err) => {
-      alert(err);
+      console.log(err);
     });
 
     api.getCards()
     .then((response) => {
-      setCards(response);
+      setCards(response.cardsList.reverse());
     })
     .catch((err) => {
-      alert(err);
+      console.log(err);
     });
-  }, []);
+  }, [loggedIn]);
 
   useEffect(() => {
     tokenCheck();
-  }, [])
+  }, [loggedIn])
 
   useEffect(() => {
     if (loggedIn) {
         history.push("/");
         return;
     }
-    history.push('/sign-in');
+    history.push('/signin');
 }, [loggedIn, history]);
 
   const handleEditProfileClick = () => {
@@ -92,30 +92,31 @@ function App() {
 
   const handleUpdateUser = ({ name, about }) => {
     api.editUserInfo({ name, about })
-    .then(({ name, about }) => {
+    .then(() => {
       setCurrentUser({...currentUser, name, about })
     })
     .catch((err) => {
-      alert(err);
+      console.log(err);
     });
   }
 
   const handleUpdateAvatar = ({ avatar }) => {
     api.editUserAvatar({ avatar })
-    .then(({ avatar }) => {
+    .then(() => {
       setCurrentUser({...currentUser, avatar })
     })
     .catch((err) => {
-      alert(err);
+      console.log(err);
     });
   }
 
   const handleCardLike = (card) => {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-    api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
-      setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+    const isLiked = card.likes.some(i => i === currentUser._id);
+    console.log(isLiked);
+    api.changeLikeCardStatus(card._id, isLiked).then((res) => {
+      setCards((state) => state.map((c) => c._id === card._id ? res.data : c));
     }).catch((err) => {
-      alert(err);
+      console.log(err);
     });
   }
 
@@ -124,17 +125,17 @@ function App() {
     .then(() => {
       setCards((state) => state.filter((c) => c._id === card._id ? !c : c));
     }).catch((err) => {
-      alert(err);
+      console.log(err);
     });
   }
-
+  
   const handleAddPlaceSubmit = (newCard) => {
     api.postCard(newCard)
-    .then((newCard) => {
-      setCards([newCard, ...cards]);
+    .then((res) => {
+      setCards([res.data, ...cards]);
     })
     .catch((err) => {
-      alert(err);
+      console.log(err);
     });
   }
 
@@ -142,7 +143,7 @@ function App() {
     return api.register({password, email})
     .then(() => {
       setInfoTooltipOpen({ opened: true, success: true });
-      history.push('/sign-in');
+      history.push('/signin');
     })
     .catch(() => {
       setInfoTooltipOpen({ opened: true, success: false });
@@ -176,7 +177,7 @@ function App() {
           setLoggedIn(true);
         }
       }).catch((err) => {
-        alert(err);
+        console.log(err);
       });
     }
   }
@@ -186,23 +187,23 @@ function App() {
       <div className="page">
         <Header logo={logo} email={userEmail} loggedIn={loggedIn} handleLogout={handleLogout} />
         <Switch>
-          <Route path="/sign-up">
+          <Route path="/signup">
             <Register handleRegister={handleRegister} />
           </Route>
-          <Route path="/sign-in">
+          <Route path="/signin">
             <Login handleLogin={handleLogin} />
           </Route>
           <ProtectedRoute
-          exact path="/"
-          loggedIn={loggedIn}
-          component={Main}
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          onCardClick={handleCardClick}
-          cards={cards}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}>
+            exact path="/"
+            loggedIn={loggedIn}
+            component={Main}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            cards={cards}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}>
           </ProtectedRoute>
         </Switch>
         <EditProfilePopup

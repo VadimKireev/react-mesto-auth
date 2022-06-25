@@ -1,14 +1,17 @@
 class Api {
   constructor(config) {
-    this._cardsUrl = config.cardsUrl;
-    this._userInfoUrl = config.userInfoUrl;
-    this._userAvatarUrl = config.userAvatarUrl;
     this._baseUrl = config.baseUrl;
-    this._headers = config.headers;
+  }
+
+  get _headers() {
+    return {
+      'Content-Type': 'application/json',
+      authorization: `Bearer ${localStorage.getItem('token')}`,
+    }
   }
 
   getUserInfo() {
-    return fetch(this._userInfoUrl, {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
       headers: this._headers
     }).then((res) => {
@@ -20,7 +23,7 @@ class Api {
   }
 
   editUserInfo(data) {
-    return fetch(this._userInfoUrl, {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify(data)
@@ -33,7 +36,7 @@ class Api {
   }
 
   editUserAvatar(newAvatarUrl) {
-    return fetch(this._userAvatarUrl, {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify(newAvatarUrl)
@@ -46,7 +49,7 @@ class Api {
   }
 
   getCards() {
-    return fetch(this._cardsUrl, {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'GET',
       headers: this._headers
     }).then((res) => {
@@ -58,7 +61,7 @@ class Api {
   }
 
   postCard(data) {
-    return fetch(this._cardsUrl, {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
       headers: this._headers,
       body: JSON.stringify(data)
@@ -71,7 +74,7 @@ class Api {
   }
 
   deleteCard(id) {
-    return fetch(`${this._cardsUrl}${id}`, {
+    return fetch(`${this._baseUrl}/cards/${id}`, {
       method: 'DELETE',
       headers: this._headers
     }).then((res) => {
@@ -83,7 +86,7 @@ class Api {
   }
 
   changeLikeCardStatus(id, isLiked) {
-    return fetch(`${this._cardsUrl}${id}/likes`, {
+    return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: isLiked ? 'DELETE' : 'PUT',
       headers: this._headers
     }).then((res) => {
@@ -137,14 +140,7 @@ class Api {
 }
 
 const api = new Api({
-  cardsUrl: 'https://mesto.nomoreparties.co/v1/cohort-37/cards/',
-  userInfoUrl: 'https://nomoreparties.co/v1/cohort-37/users/me/',
-  userAvatarUrl: 'https://mesto.nomoreparties.co/v1/cohort-37/users/me/avatar/',
-  baseUrl: 'https://auth.nomoreparties.co',
-  headers: {
-    authorization: '0d42fc8d-987f-4cd6-8e38-433e5816658e',
-    'Content-Type': 'application/json'
-  }
+  baseUrl: 'http://localhost:3001'
 });
 
 export default api;

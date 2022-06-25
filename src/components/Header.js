@@ -5,9 +5,9 @@ function Header({logo, email, loggedIn, handleLogout}) {
 
   function getButtonValue() {
     switch (location.pathname) {
-      case '/sign-in':
+      case '/signin':
         return 'Регистрация';
-      case '/sign-up':
+      case '/signup':
         return 'Войти';
       default:
         return 'Выйти';
@@ -16,12 +16,12 @@ function Header({logo, email, loggedIn, handleLogout}) {
 
   function getButtonRoute() {
     switch (location.pathname) {
-      case '/sign-in':
-        return '/sign-up';
-      case '/sign-up':
-        return '/sign-in';
+      case '/signin':
+        return '/signup';
+      case '/signup':
+        return '/signin';
       default:
-        return '/sign-in';
+        return '/signin';
     }
   }
 
